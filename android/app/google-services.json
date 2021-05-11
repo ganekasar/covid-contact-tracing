@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "295316206235",
+    "project_id": "covid-tracking-gsk",
+    "storage_bucket": "covid-tracking-gsk.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295316206235:android:fb6b98775a2835a7ba4c3e",
+        "android_client_info": {
+          "package_name": "com.diganta.contacttracingprototype"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295316206235-utplvmd118rqta3f0kt559fdudjlhlad.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlybaNyr1QmaoQXwkRChxaM3I5gN_qie8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295316206235-utplvmd118rqta3f0kt559fdudjlhlad.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

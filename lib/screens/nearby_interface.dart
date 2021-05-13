@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:nearby_connections/nearby_connections.dart';
-import 'components/contact_card.dart';
-import 'constants.dart';
+import '../components/contact_card.dart';
+import '../constants.dart';
 
 class NearbyInterface extends StatefulWidget {
   static const String id = 'nearby_interface';
@@ -87,9 +87,9 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             _firestore.collection('users').document(loggedInUser.email);
 
         docRef.collection('met_with').document(name).setData({
-          'username': 'Sudhanshu',
-          'contact time': DateTime.now(),
-          'contact location': 'wce',
+          'username': await getUsernameOfEmail(email: name),
+          'contact time': DateTime.now().toString(),
+          'contact location': (await location.getLocation()).toString(),
         });
       }, onEndpointLost: (id) {
         print(id);
@@ -139,13 +139,15 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(
-          Icons.menu,
-          color: Colors.deepPurple[800],
+        leading: IconButton(
+          icon: Icon(Icons.menu,color: Colors.deepPurple[800]),
+          onPressed: (){
+            print("Hello");
+          },
         ),
         centerTitle: true,
         title: Text(
-          'Covid Tracingdir'
+          'Covid Tracing'
               '',
           style: TextStyle(
             color: Colors.deepPurple[800],
@@ -207,11 +209,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 30.0),
-            child: RaisedButton(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0)),
-              elevation: 5.0,
-              color: Colors.deepPurple[400],
+            child: ElevatedButton(
               onPressed: () async {
                 try {
                   bool a = await Nearby().startAdvertising(

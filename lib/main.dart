@@ -1,7 +1,7 @@
-import 'package:contacttracingprototype/login.dart';
-import 'package:contacttracingprototype/nearby_interface.dart';
-import 'package:contacttracingprototype/registration.dart';
-import 'package:contacttracingprototype/welcome_screen.dart';
+import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/login.dart';
+import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/nearby_interface.dart';
+import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/registration.dart';
+import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());

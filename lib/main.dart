@@ -3,8 +3,13 @@ import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/nearby_inte
 import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/registration.dart';
 import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(Phoenix(
+    child: MyApp(),
+  ));
+}
 
 class MyApp extends StatelessWidget {
   @override

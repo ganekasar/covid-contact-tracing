@@ -5,6 +5,7 @@ import 'package:location/location.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import '../components/contact_card.dart';
 import '../constants.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 class NearbyInterface extends StatefulWidget {
   static const String id = 'nearby_interface';
@@ -45,48 +46,26 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             : null;
         bool ifInfected=false;
         print(currUsername);
-        Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds){
-          try{
-            ifInfected=ds['is infected'];
-          }
-          catch(e){
-            ifInfected=false;
-          }
-          if(ifInfected){
-            contactInfection.add("Infected");
-          }else{
-            contactInfection.add("Not Infected");
+         Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds){
+          print(currEmail);
+          print(ds['is infected']);
+          ifInfected=ds['is infected'];
+          if (!contactTraces.contains(currUsername)) {
+            contactTraces.add(currUsername);
+            contactTimes.add(currTime);
+            contactLocations.add(currLocation);
+            if(ifInfected==true){
+              contactInfection.add("Infected");
+            }else{
+              contactInfection.add("Not Infected");
+            }
           }
         });
-        print(currUsername);
-        if (!contactTraces.contains(currUsername)) {
-          contactTraces.add(currUsername);
-          contactTimes.add(currTime);
-          contactLocations.add(currLocation);
-        }
       }
       setState(() {});
       print(loggedInUser.email);
     });
   }
-
-  // void isInfect() async{
-  //   for(var user in contactTraces) {
-  //     bool ifInfected=false;
-  //     print(user);
-  //     var userInf = await Firestore.instance.collection('users').document(user).get().then((DocumentSnapshot ds){
-  //       print(ds['is infected']);
-  //       ifInfected=ds['is infected'];
-  //     });
-  //     if(ifInfected){
-  //       contactInfection.add("Infected");
-  //     }else{
-  //       contactInfection.add("Not Infected");
-  //     }
-  //     print(userInf);
-  //     print(user);
-  //   }
-  // }
 
   void deleteOldContacts(int threshold) async {
     await getCurrentUser();
@@ -117,11 +96,9 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       bool a = await Nearby().startDiscovery(loggedInUser.email, strategy,
           onEndpointFound: (id, name, serviceId) async {
         print('I saw id:$id with name:$name');
-        print("SSS");
         var docRef =
             _firestore.collection('users').document(loggedInUser.email);
         print(await getUsernameOfEmail(email: name));
-        print("SSS");
         docRef.collection('met_with').document(name).setData({
           'username': await getUsernameOfEmail(email: name),
           'contact time': DateTime.now(),
@@ -169,7 +146,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     super.initState();
     deleteOldContacts(14);
     addContactsToList();
-    print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
     getPermissions();
   }
 
@@ -179,12 +155,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
 
     return Scaffold(
       appBar: AppBar(
-        // leading: IconButton(
-        //   icon: Icon(Icons.menu,color: Colors.deepPurple[800]),
-        //   onPressed: (){
-        //     print("Hello");
-        //   },
-        // ),
         centerTitle: true,
         title: Text(
           'Covid Tracing',
@@ -214,8 +184,40 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
               _firestore.collection('users').document(loggedInUser.email).setData({
                 'is infected':true,
               });
-              print(" object");
+              print("infected");
             });
+            // Then close the drawer
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          title: Text('Refresh'),
+          onTap: () {
+            // Update the state of the app
+            setState(() {});
+            // Then close the drawer
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          title: Text('I am Not Infected'),
+          onTap: () {
+            // Update the state of the app
+            setState(() {
+              _firestore.collection('users').document(loggedInUser.email).setData({
+                'is infected':false,
+              });
+              print(" Not infected");
+            });
+            // Then close the drawer
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          title: Text('Restart'),
+          onTap: () {
+            // Update the state of the app
+            Phoenix.rebirth(context);
             // Then close the drawer
             Navigator.pop(context);
           },

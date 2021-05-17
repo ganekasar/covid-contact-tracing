@@ -23,6 +23,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   List<dynamic> contactTraces = [];
   List<dynamic> contactTimes = [];
   List<dynamic> contactLocations = [];
+  List<String> contactInfection = [];
 
   void addContactsToList() async {
     await getCurrentUser();
@@ -35,13 +36,29 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         .listen((snapshot) {
       for (var doc in snapshot.documents) {
         String currUsername = doc.data['username'];
+        String currEmail = doc.data['user email'];
         DateTime currTime = doc.data.containsKey('contact time')
             ? (doc.data['contact time'] as Timestamp).toDate()
             : null;
         String currLocation = doc.data.containsKey('contact location')
             ? doc.data['contact location']
             : null;
-
+        bool ifInfected=false;
+        print(currUsername);
+        Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds){
+          try{
+            ifInfected=ds['is infected'];
+          }
+          catch(e){
+            ifInfected=false;
+          }
+          if(ifInfected){
+            contactInfection.add("Infected");
+          }else{
+            contactInfection.add("Not Infected");
+          }
+        });
+        print(currUsername);
         if (!contactTraces.contains(currUsername)) {
           contactTraces.add(currUsername);
           contactTimes.add(currTime);
@@ -52,6 +69,24 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       print(loggedInUser.email);
     });
   }
+
+  // void isInfect() async{
+  //   for(var user in contactTraces) {
+  //     bool ifInfected=false;
+  //     print(user);
+  //     var userInf = await Firestore.instance.collection('users').document(user).get().then((DocumentSnapshot ds){
+  //       print(ds['is infected']);
+  //       ifInfected=ds['is infected'];
+  //     });
+  //     if(ifInfected){
+  //       contactInfection.add("Infected");
+  //     }else{
+  //       contactInfection.add("Not Infected");
+  //     }
+  //     print(userInf);
+  //     print(user);
+  //   }
+  // }
 
   void deleteOldContacts(int threshold) async {
     await getCurrentUser();
@@ -82,14 +117,16 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       bool a = await Nearby().startDiscovery(loggedInUser.email, strategy,
           onEndpointFound: (id, name, serviceId) async {
         print('I saw id:$id with name:$name');
-
+        print("SSS");
         var docRef =
             _firestore.collection('users').document(loggedInUser.email);
-
+        print(await getUsernameOfEmail(email: name));
+        print("SSS");
         docRef.collection('met_with').document(name).setData({
           'username': await getUsernameOfEmail(email: name),
-          'contact time': DateTime.now().toString(),
+          'contact time': DateTime.now(),
           'contact location': (await location.getLocation()).toString(),
+          'user email':name,
         });
       }, onEndpointLost: (id) {
         print(id);
@@ -132,30 +169,59 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     super.initState();
     deleteOldContacts(14);
     addContactsToList();
+    print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
     getPermissions();
   }
 
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu,color: Colors.deepPurple[800]),
-          onPressed: (){
-            print("Hello");
-          },
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.menu,color: Colors.deepPurple[800]),
+        //   onPressed: (){
+        //     print("Hello");
+        //   },
+        // ),
         centerTitle: true,
         title: Text(
-          'Covid Tracing'
-              '',
+          'Covid Tracing',
           style: TextStyle(
             color: Colors.deepPurple[800],
             fontWeight: FontWeight.bold,
             fontSize: 28.0,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.orange,
+      ),
+      drawer: Drawer(
+      child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.deepPurple[800],
+          ),
+          child: Text(loggedInUser.email),
+        ),
+        ListTile(
+          title: Text('I am Infected'),
+          onTap: () {
+            // Update the state of the app
+            setState(() {
+              _firestore.collection('users').document(loggedInUser.email).setData({
+                'is infected':true,
+              });
+              print(" object");
+            });
+            // Then close the drawer
+            Navigator.pop(context);
+          },
+        ),
+      ],
+      ),
       ),
       body: Column(
         children: <Widget>[
@@ -212,6 +278,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             child: ElevatedButton(
               onPressed: () async {
                 try {
+                 // Nearby().stopAdvertising();
                   bool a = await Nearby().startAdvertising(
                     loggedInUser.email,
                     strategy,
@@ -223,12 +290,12 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
                       print('Disconnected $id');
                     },
                   );
-
                   print('ADVERTISING ${a.toString()}');
-                } catch (e) {
+                }
+                catch (e) {
                   print(e);
                 }
-
+                //Nearby().stopDiscovery();
                 discovery();
               },
               child: Text(
@@ -242,17 +309,17 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.0),
               child: ListView.builder(
+                itemCount:contactTraces.length,
                 itemBuilder: (context, index) {
                   return ContactCard(
                     imagePath: 'images/profile1.jpg',
                     email: contactTraces[index],
-                    infection: 'Not-Infected',
+                    infection: contactInfection[index],
                     contactUsername: contactTraces[index],
                     contactTime: contactTimes[index],
                     contactLocation: contactLocations[index],
                   );
                 },
-                itemCount: contactTraces.length,
               ),
             ),
           ),
@@ -260,4 +327,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       ),
     );
   }
+
 }
+
+

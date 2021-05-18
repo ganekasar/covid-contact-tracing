@@ -1,7 +1,7 @@
-import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/login.dart';
-import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/nearby_interface.dart';
-import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/registration.dart';
-import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/welcome_screen.dart';
+import 'screens/login.dart';
+import 'screens/nearby_interface.dart';
+import 'screens/registration.dart';
+import 'screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 

@@ -44,19 +44,19 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         String currLocation = doc.data.containsKey('contact location')
             ? doc.data['contact location']
             : null;
-        bool ifInfected=false;
+        bool ifInfected = false;
         print(currUsername);
          Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds){
           print(currEmail);
           print(ds['is infected']);
-          ifInfected=ds['is infected'];
+          ifInfected = ds['is infected'];
           if (!contactTraces.contains(currUsername)) {
             contactTraces.add(currUsername);
             contactTimes.add(currTime);
             contactLocations.add(currLocation);
-            if(ifInfected==true){
+            if(ifInfected == true) {
               contactInfection.add("Infected");
-            }else{
+            } else {
               contactInfection.add("Not Infected");
             }
           }

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacttracingprototype/components/rounded_button.dart';
 import 'package:contacttracingprototype/constants.dart';
-import 'file:///D:/AppsFromFlutter/covid-contact-tracing/lib/screens/nearby_interface.dart';
+import 'nearby_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';

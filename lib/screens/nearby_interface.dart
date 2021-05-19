@@ -35,36 +35,32 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         .collection('met_with')
         .snapshots()
         .listen((snapshot) {
-      for (var doc in snapshot.documents) {
-        String currUsername = doc.data['username'];
-        String currEmail = doc.data['user email'];
-        DateTime currTime = doc.data.containsKey('contact time')
-            ? (doc.data['contact time'] as Timestamp).toDate()
-            : null;
-        String currLocation = doc.data.containsKey('contact location')
-            ? doc.data['contact location']
-            : null;
-        bool ifInfected = false;
-        print(currUsername);
-         Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds){
-          print(currEmail);
-          print(ds['is infected']);
-          ifInfected = ds['is infected'];
-          if (!contactTraces.contains(currUsername)) {
-            contactTraces.add(currUsername);
-            contactTimes.add(currTime);
-            contactLocations.add(currLocation);
-            if(ifInfected == true) {
-              contactInfection.add("Infected");
-            } else {
-              contactInfection.add("Not Infected");
-            }
+          for (var doc in snapshot.documents) {
+            String currUsername = doc.data['username'];
+            String currEmail = doc.data['user email'];
+            DateTime currTime = doc.data.containsKey('contact time') ? (doc.data['contact time'] as Timestamp).toDate() : null;
+            String currLocation = doc.data.containsKey('contact location') ? doc.data['contact location'] : null;
+            bool ifInfected = false;
+            print(currUsername);
+            Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds) {
+              print(currEmail);
+              print(ds['is infected']);
+              ifInfected = ds['is infected'];
+              if (!contactTraces.contains(currUsername)) {
+                contactTraces.add(currUsername);
+                contactTimes.add(currTime);
+                contactLocations.add(currLocation);
+                if(ifInfected == true) {
+                  contactInfection.add("Infected");
+                } else {
+                  contactInfection.add("Not Infected");
+                }
+              }
+            });
           }
+          setState(() {});
+          print(loggedInUser.email);
         });
-      }
-      setState(() {});
-      print(loggedInUser.email);
-    });
   }
 
   void deleteOldContacts(int threshold) async {
@@ -77,16 +73,16 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         .collection('met_with')
         .snapshots()
         .listen((snapshot) {
-      for (var doc in snapshot.documents) {
-        if (doc.data.containsKey('contact time')) {
-          DateTime contactTime = (doc.data['contact time'] as Timestamp)
+          for (var doc in snapshot.documents) {
+            if (doc.data.containsKey('contact time')) {
+              DateTime contactTime = (doc.data['contact time'] as Timestamp)
               .toDate();
-          if (timeNow.difference(contactTime).inDays > threshold) {
-            doc.reference.delete();
+              if (timeNow.difference(contactTime).inDays > threshold) {
+                doc.reference.delete();
+              }
+            }
           }
-        }
-      }
-    });
+        });
 
     setState(() {});
   }
@@ -95,18 +91,18 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     try {
       bool a = await Nearby().startDiscovery(loggedInUser.email, strategy,
           onEndpointFound: (id, name, serviceId) async {
-        print('I saw id:$id with name:$name');
-        var docRef =
-            _firestore.collection('users').document(loggedInUser.email);
-        print(await getUsernameOfEmail(email: name));
-        docRef.collection('met_with').document(name).setData({
-          'username': await getUsernameOfEmail(email: name),
-          'contact time': DateTime.now(),
-          'contact location': (await location.getLocation()).toString(),
-          'user email':name,
-        });
-      }, onEndpointLost: (id) {
-        print(id);
+            print('I saw id:$id with name:$name');
+            var docRef =
+              _firestore.collection('users').document(loggedInUser.email);
+            print(await getUsernameOfEmail(email: name));
+            docRef.collection('met_with').document(name).setData({
+              'username' : await getUsernameOfEmail(email: name),
+              'contact time': DateTime.now(),
+              'contact location': (await location.getLocation()).toString(),
+              'user email':name,
+            });
+          }, onEndpointLost: (id) {
+          print(id);
       });
       print('DISCOVERING: ${a.toString()}');
     } catch (e) {

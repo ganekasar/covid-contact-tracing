@@ -92,6 +92,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           'is infected': false,
                         });
                         Navigator.pushNamed(context, NearbyInterface.id);
+                      } else {
+                        Navigator.pushNamed(context, RegistrationScreen.id);
                       }
                       setState(() {
                         showSpinner = false;

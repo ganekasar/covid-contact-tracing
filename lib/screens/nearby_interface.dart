@@ -6,6 +6,7 @@ import 'package:nearby_connections/nearby_connections.dart';
 import '../components/contact_card.dart';
 import '../constants.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'welcome_screen.dart';
 
 class NearbyInterface extends StatefulWidget {
   static const String id = 'nearby_interface';
@@ -41,9 +42,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             DateTime currTime = doc.data.containsKey('contact time') ? (doc.data['contact time'] as Timestamp).toDate() : null;
             String currLocation = doc.data.containsKey('contact location') ? doc.data['contact location'] : null;
             bool ifInfected = false;
-            print(currUsername);
             Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds) {
-              print(currEmail);
               print(ds['is infected']);
               ifInfected = ds['is infected'];
               if (!contactTraces.contains(currUsername)) {
@@ -59,7 +58,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             });
           }
           setState(() {});
-          print(loggedInUser.email);
         });
   }
 
@@ -94,11 +92,12 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
             print('I saw id:$id with name:$name');
             var docRef =
               _firestore.collection('users').document(loggedInUser.email);
-            print(await getUsernameOfEmail(email: name));
+            var username = await getUsernameOfEmail(email: name);
+            var loc = (await location.getLocation()).toString();
             docRef.collection('met_with').document(name).setData({
-              'username' : await getUsernameOfEmail(email: name),
+              'username' : (username != null) ? username : 'anonymous',
               'contact time': DateTime.now(),
-              'contact location': (await location.getLocation()).toString(),
+              'contact location': loc,
               'user email':name,
             });
           }, onEndpointLost: (id) {
@@ -107,6 +106,8 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       print('DISCOVERING: ${a.toString()}');
     } catch (e) {
       print(e);
+      print('Unable to DISCOVER');
+      Navigator.pushNamed(context, WelcomeScreen.id);
     }
   }
 
@@ -134,6 +135,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       }
     } catch (e) {
       print(e);
+      Navigator.pushNamed(context, WelcomeScreen.id);
     }
   }
 
@@ -161,6 +163,19 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
           ),
         ),
         backgroundColor: Colors.orange,
+        actions: [
+          TextButton(
+              onPressed: () {
+                _auth.signOut();
+                Navigator.pushNamed(context, WelcomeScreen.id);
+              },
+              child: const Text('Log Out'),
+              style: TextButton.styleFrom(
+                textStyle: const TextStyle(fontSize: 20),
+                primary: Colors.white,
+              ),
+          ),
+        ],
       ),
       drawer: Drawer(
       child: ListView(

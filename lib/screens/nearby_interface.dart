@@ -86,6 +86,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   }
 
   void discovery() async {
+    await getCurrentUser();
     try {
       bool a = await Nearby().startDiscovery(loggedInUser.email, strategy,
           onEndpointFound: (id, name, serviceId) async {
@@ -107,7 +108,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     } catch (e) {
       print(e);
       print('Unable to DISCOVER');
-      Navigator.pushNamed(context, WelcomeScreen.id);
     }
   }
 
@@ -132,11 +132,34 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       final user = await _auth.currentUser();
       if (user != null) {
         loggedInUser = user;
+        print(loggedInUser.email);
       }
     } catch (e) {
       print(e);
       Navigator.pushNamed(context, WelcomeScreen.id);
     }
+  }
+
+  void startDiscovery() async {
+    try {
+      bool a = await Nearby().startAdvertising(
+        loggedInUser.email,
+        strategy,
+        onConnectionInitiated: null,
+        onConnectionResult: (id, status) {
+          print(status);
+        },
+        onDisconnected: (id) {
+          print('Disconnected $id');
+        },
+      );
+      print('ADVERTISING ${a.toString()}');
+    }
+    catch (e) {
+      print(e);
+    }
+    //Nearby().stopDiscovery();
+    discovery();
   }
 
   @override
@@ -145,8 +168,8 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     deleteOldContacts(14);
     addContactsToList();
     getPermissions();
+    startDiscovery();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -283,37 +306,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
                     )
                   ],
                 ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 30.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                try {
-                 // Nearby().stopAdvertising();
-                  bool a = await Nearby().startAdvertising(
-                    loggedInUser.email,
-                    strategy,
-                    onConnectionInitiated: null,
-                    onConnectionResult: (id, status) {
-                      print(status);
-                    },
-                    onDisconnected: (id) {
-                      print('Disconnected $id');
-                    },
-                  );
-                  print('ADVERTISING ${a.toString()}');
-                }
-                catch (e) {
-                  print(e);
-                }
-                //Nearby().stopDiscovery();
-                discovery();
-              },
-              child: Text(
-                'Start Tracing',
-                style: kButtonTextStyle,
               ),
             ),
           ),

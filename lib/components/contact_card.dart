@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'bottom_sheet_text.dart';
 
@@ -14,7 +15,7 @@ class ContactCard extends StatelessWidget {
   final String email;
   final String infection;
   final String contactUsername;
-  final DateTime contactTime;
+  final Timestamp contactTime;
   final String contactLocation;
 
   @override

@@ -196,10 +196,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
 
 class UserStream extends StatelessWidget {
-  Firestore _firestore = Firestore.instance;
-  FirebaseUser loggedInUser;
-  String testText = '';
-  final _auth = FirebaseAuth.instance;
+  final Firestore _firestore = Firestore.instance;
 
   @override
   Widget build(BuildContext context) {

@@ -52,7 +52,6 @@ class ContactCard extends StatelessWidget {
                     BottomSheetText(
                         question: 'Contact Location', result: contactLocation),
                     SizedBox(height: 5.0),
-                    BottomSheetText(question: 'Times Contacted', result: '1'),
                   ],
                 ),
               );

@@ -8,57 +8,53 @@ import '../constants.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'welcome_screen.dart';
 
+Location location = Location();
+Firestore _firestore = Firestore.instance;
+final Strategy strategy = Strategy.P2P_STAR;
+FirebaseUser loggedInUser;
+String testText = '';
+final _auth = FirebaseAuth.instance;
+
+
 class NearbyInterface extends StatefulWidget {
   static const String id = 'nearby_interface';
-
   @override
   _NearbyInterfaceState createState() => _NearbyInterfaceState();
 }
 
 class _NearbyInterfaceState extends State<NearbyInterface> {
-  Location location = Location();
-  Firestore _firestore = Firestore.instance;
-  final Strategy strategy = Strategy.P2P_STAR;
-  FirebaseUser loggedInUser;
-  String testText = '';
-  final _auth = FirebaseAuth.instance;
-  List<dynamic> contactTraces = [];
-  List<dynamic> contactTimes = [];
-  List<dynamic> contactLocations = [];
-  List<String> contactInfection = [];
 
   void addContactsToList() async {
     await getCurrentUser();
-
-    _firestore
-        .collection('users')
-        .document(loggedInUser.email)
-        .collection('met_with')
-        .snapshots()
-        .listen((snapshot) {
-          for (var doc in snapshot.documents) {
-            String currUsername = doc.data['username'];
-            String currEmail = doc.data['user email'];
-            DateTime currTime = doc.data.containsKey('contact time') ? (doc.data['contact time'] as Timestamp).toDate() : null;
-            String currLocation = doc.data.containsKey('contact location') ? doc.data['contact location'] : null;
-            bool ifInfected = false;
-            Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds) {
-              print(ds['is infected']);
-              ifInfected = ds['is infected'];
-              if (!contactTraces.contains(currUsername)) {
-                contactTraces.add(currUsername);
-                contactTimes.add(currTime);
-                contactLocations.add(currLocation);
-                if(ifInfected == true) {
-                  contactInfection.add("Infected");
-                } else {
-                  contactInfection.add("Not Infected");
-                }
-              }
-            });
-          }
-          setState(() {});
-        });
+    // _firestore
+    //     .collection('users')
+    //     .document(loggedInUser.email)
+    //     .collection('met_with')
+    //     .snapshots()
+    //     .listen((snapshot) {
+    //       for (var doc in snapshot.documents) {
+    //         String currUsername = doc.data['username'];
+    //         String currEmail = doc.data['user email'];
+    //         DateTime currTime = doc.data.containsKey('contact time') ? (doc.data['contact time'] as Timestamp).toDate() : null;
+    //         String currLocation = doc.data.containsKey('contact location') ? doc.data['contact location'] : null;
+    //         bool ifInfected = false;
+    //         Firestore.instance.collection('users').document(currEmail).get().then((DocumentSnapshot ds) {
+    //           print(ds['is infected']);
+    //           ifInfected = ds['is infected'];
+    //           if (!contactTraces.contains(currUsername)) {
+    //             contactTraces.add(currUsername);
+    //             contactTimes.add(currTime);
+    //             contactLocations.add(currLocation);
+    //             if(ifInfected == true) {
+    //               contactInfection.add("Infected");
+    //             } else {
+    //               contactInfection.add("Not Infected");
+    //             }
+    //           }
+    //         });
+    //       }
+    //       setState(() {});
+    //     });
   }
 
   void deleteOldContacts(int threshold) async {
@@ -86,6 +82,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   }
 
   void discovery() async {
+    await getCurrentUser();
     try {
       bool a = await Nearby().startDiscovery(loggedInUser.email, strategy,
           onEndpointFound: (id, name, serviceId) async {
@@ -107,7 +104,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     } catch (e) {
       print(e);
       print('Unable to DISCOVER');
-      Navigator.pushNamed(context, WelcomeScreen.id);
     }
   }
 
@@ -132,11 +128,34 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
       final user = await _auth.currentUser();
       if (user != null) {
         loggedInUser = user;
+        print(loggedInUser.email);
       }
     } catch (e) {
       print(e);
       Navigator.pushNamed(context, WelcomeScreen.id);
     }
+  }
+
+  void startDiscovery() async {
+    try {
+      bool a = await Nearby().startAdvertising(
+        loggedInUser.email,
+        strategy,
+        onConnectionInitiated: null,
+        onConnectionResult: (id, status) {
+          print(status);
+        },
+        onDisconnected: (id) {
+          print('Disconnected $id');
+        },
+      );
+      print('ADVERTISING ${a.toString()}');
+    }
+    catch (e) {
+      print(e);
+    }
+    //Nearby().stopDiscovery();
+    discovery();
   }
 
   @override
@@ -145,8 +164,8 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     deleteOldContacts(14);
     addContactsToList();
     getPermissions();
+    startDiscovery();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +204,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
           decoration: BoxDecoration(
             color: Colors.deepPurple[800],
           ),
-          child: Text(loggedInUser.email),
+          child: loggedInUser!=null ? Text(loggedInUser.email):Text("Loading"),
         ),
         ListTile(
           title: Text('I am Infected'),
@@ -286,56 +305,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 30.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                try {
-                 // Nearby().stopAdvertising();
-                  bool a = await Nearby().startAdvertising(
-                    loggedInUser.email,
-                    strategy,
-                    onConnectionInitiated: null,
-                    onConnectionResult: (id, status) {
-                      print(status);
-                    },
-                    onDisconnected: (id) {
-                      print('Disconnected $id');
-                    },
-                  );
-                  print('ADVERTISING ${a.toString()}');
-                }
-                catch (e) {
-                  print(e);
-                }
-                //Nearby().stopDiscovery();
-                discovery();
-              },
-              child: Text(
-                'Start Tracing',
-                style: kButtonTextStyle,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.0),
-              child: ListView.builder(
-                itemCount:contactTraces.length,
-                itemBuilder: (context, index) {
-                  return ContactCard(
-                    imagePath: 'images/profile1.jpg',
-                    email: contactTraces[index],
-                    infection: contactInfection[index],
-                    contactUsername: contactTraces[index],
-                    contactTime: contactTimes[index],
-                    contactLocation: contactLocations[index],
-                  );
-                },
-              ),
-            ),
-          ),
+         ContactStream(),
         ],
       ),
     );
@@ -344,3 +314,46 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
 }
 
 
+
+class ContactStream extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firestore.collection('users').document(loggedInUser.email).collection('met_with').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.lightBlueAccent,
+            ),
+          );
+        }
+        final messages = snapshot.data.documents.reversed;
+        List<ContactCard> messageBubbles = [];
+        for (var message in messages) {
+          final users = message.data['username'];
+          final infectedStatus = message.data['is infected'] ? "Infected": "Not Infected" ;
+          final locationContact= message.data['contact location'];
+          final timeContact=message.data['contact time'];
+          final emailUser=loggedInUser.email;
+          final messageBubble = ContactCard(
+            imagePath: 'images/profile1.jpg',
+            infection: infectedStatus,
+            contactUsername: users,
+            email:emailUser,
+            contactTime: timeContact,
+            contactLocation: locationContact,
+          );
+          messageBubbles.add(messageBubble);
+        }
+        return Expanded(
+          child: ListView(
+            reverse: true,
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            children: messageBubbles,
+          ),
+        );
+      },
+    );
+  }
+}

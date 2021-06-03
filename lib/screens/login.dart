@@ -1,5 +1,6 @@
 import 'package:contacttracingprototype/components/rounded_button.dart';
 import 'package:contacttracingprototype/constants.dart';
+import 'package:contacttracingprototype/screens/admin_screen.dart';
 import 'nearby_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,8 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     try {
                       final user = await _auth.signInWithEmailAndPassword(
                           email: email, password: password);
-                          if (user != null) {
-                            Navigator.pushNamed(context, NearbyInterface.id);
+                          if (user != null&& email!=null) {
+                            if(email=="admin@wce.in"){
+                              Navigator.pushNamed(context, AdminScreen.id);
+                            }
+                            else
+                              Navigator.pushNamed(context, NearbyInterface.id);
                           } else {
                             Navigator.pushNamed(context, LoginScreen.id);
                           }

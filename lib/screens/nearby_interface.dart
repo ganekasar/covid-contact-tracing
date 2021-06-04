@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:nearby_connections/nearby_connections.dart';
@@ -151,11 +152,34 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
                 color: Colors.deepPurple[800],
               ),
               child: loggedInUser != null
-                  ? Text(loggedInUser.email)
+                  ? Text(loggedInUser.email,style: TextStyle(fontSize: 35.0,fontStyle: FontStyle.italic,fontWeight: FontWeight.w900),)
                   : Text("Loading"),
             ),
             ListTile(
-              title: Text('I am Infected'),
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  setState(() {
+                    _firestore
+                        .collection('users')
+                        .document(loggedInUser.email)
+                        .updateData({
+                      'is infected': true,
+                    });
+                    print("infected");
+                  });
+                  // Then close the drawer
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  alignment: Alignment.center,
+                  child: const CircleAvatar(),
+                ),
+              ),
+              title: Text('I am Infected',style: TextStyle(fontSize: 25.0),),
               onTap: () {
                 // Update the state of the app
                 setState(() {
@@ -172,7 +196,22 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
               },
             ),
             ListTile(
-              title: Text('Refresh'),
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  setState(() {});
+                  // Then close the drawer
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  alignment: Alignment.center,
+                  child: const CircleAvatar(),
+                ),
+              ),
+              title: Text('Refresh',style: TextStyle(fontSize: 25.0,color: Colors.green),),
               onTap: () {
                 // Update the state of the app
                 setState(() {});
@@ -181,7 +220,30 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
               },
             ),
             ListTile(
-              title: Text('I am Not Infected'),
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  setState(() {
+                    _firestore
+                        .collection('users')
+                        .document(loggedInUser.email)
+                        .updateData({
+                      'is infected': false,
+                    });
+                    print(" Not infected");
+                  });
+                  // Then close the drawer
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  alignment: Alignment.center,
+                  child: const CircleAvatar(),
+                ),
+              ),
+              title: Text('I am Not Infected',style: TextStyle(fontSize: 25.0),),
               onTap: () {
                 // Update the state of the app
                 setState(() {
@@ -198,7 +260,23 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
               },
             ),
             ListTile(
-              title: Text('Restart'),
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  // Update the state of the app
+                  Phoenix.rebirth(context);
+                  // Then close the drawer
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  alignment: Alignment.center,
+                  child: const CircleAvatar(),
+                ),
+              ),
+              title: Text('Restart',style: TextStyle(fontSize: 25.0,color: Colors.red),),
               onTap: () {
                 // Update the state of the app
                 Phoenix.rebirth(context);
@@ -360,10 +438,12 @@ class ContactStream extends StatelessWidget {
             });
               }
           );
-
+          String xyz;
           print(infectedStatus);
-
-          String xyz = infectedStatus ? 'Infected' : 'Not Infected';
+          if(infectedStatus==null)
+              xyz="No data available";
+            else
+              xyz = infectedStatus ? 'Infected' : 'Not Infected';
           if(xyz == null)
             xyz = 'No data available';
           final messageBubble = ContactCard(

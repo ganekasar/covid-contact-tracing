@@ -299,7 +299,33 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   }
 }
 
+bool infectedStatus;
+
 class ContactStream extends StatelessWidget {
+  Future<String> getInfectedStatus(id) async {
+    bool isInf;
+
+    return await Firestore.instance
+        .collection('users')
+        .document(id)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        print('Document data: ${documentSnapshot.data}');
+        isInf = documentSnapshot.data['is infected'];
+        return (documentSnapshot.data['is infected'] ? 'Infected' : 'Not Infected');
+      } else {
+        return 'No data available';
+      }
+    });
+
+    return (isInf ? 'Infected' : 'Not Infected');
+  }
+
+  Future<String> getStringInf(String id) async {
+    return await getInfectedStatus(id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -320,13 +346,26 @@ class ContactStream extends StatelessWidget {
         List<ContactCard> messageBubbles = [];
         for (var message in messages) {
           final users = message.data['username'];
-          //final infectedStatus = user['is infected'] ? "Infected" : "Not Infected";
           final locationContact = message.data['contact location'];
           final timeContact = message.data['contact time'];
           final emailUser = message.data['user email'];
-          String xyz=InfectedStatus(users).data;
-          if(xyz==null)
-              xyz="Loading";
+
+          Firestore.instance.collection('users')
+              .where('username', isEqualTo: users)
+              .snapshots()
+              .listen((QuerySnapshot querySnapshot){
+            querySnapshot.documents.forEach((document) {
+              infectedStatus = document.data['is infected'];
+                  //print(infectedStatus);
+            });
+              }
+          );
+
+          print(infectedStatus);
+
+          String xyz = infectedStatus ? 'Infected' : 'Not Infected';
+          if(xyz == null)
+            xyz = 'No data available';
           final messageBubble = ContactCard(
             imagePath: 'images/profile1.jpg',
             infection: xyz,
@@ -349,45 +388,34 @@ class ContactStream extends StatelessWidget {
   }
 }
 
+String isInfectedGlobal = 'Not available';
 
 class InfectedStatus extends StatelessWidget {
-  String data;
   String userFind;
   InfectedStatus(email){
-    userFind=email;
+    userFind = email;
   }
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _firestore
-          .collection('users')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.lightBlueAccent,
-            ),
-          );
-        }
-        final messages = snapshot.data.documents.reversed;
-        List<ContactCard> messageBubbles = [];
-        for (var message in messages) {
-          final users = message.data['username'];
-          if(users==userFind){
-            data = message['is infected'] ? "Infected" : "Not Infected";
+    return StreamBuilder(
+        stream: Firestore.instance
+            .collection('user')
+            .document(userFind) //ID OF DOCUMENT
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            print('No data found');
+            return new CircularProgressIndicator();
           }
-          final messageBubble = ContactCard();
-          messageBubbles.add(messageBubble);
+          var document = snapshot.data;
+          print('Infected Status');
+          print(document['is infected']);
+          if(document['is infected'])
+              isInfectedGlobal = 'Infected';
+          else
+            isInfectedGlobal = 'Not Infected';
+          return new Text(document['is infected'] ? 'Infected' : 'Not Infected');
         }
-        return Expanded(
-          child: ListView(
-            reverse: true,
-            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-            children: messageBubbles,
-          ),
-        );
-      },
     );
   }
 }

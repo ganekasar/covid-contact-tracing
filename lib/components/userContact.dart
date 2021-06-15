@@ -9,6 +9,7 @@ import 'package:nearby_connections/nearby_connections.dart';
 import '../components/contact_card.dart';
 import '../constants.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import '../components/listOfContacts.dart';
 
 Firestore _firestore = Firestore.instance;
 final _auth = FirebaseAuth.instance;
@@ -59,7 +60,8 @@ class UserCard extends StatelessWidget {
                           .updateData({
                         'is infected': true,
                       });
-                    }, child: Text("Mark as Infected")),
+                    },
+                        child: Text("Mark as Infected")),
                     SizedBox(height: 5.0),
                     ElevatedButton(onPressed: (){
                       _firestore
@@ -68,7 +70,10 @@ class UserCard extends StatelessWidget {
                           .updateData({
                         'is infected': false,
                       });
-                    }, child: Text("Mark as Not Infected")),
+                    },
+                        child: Text("Mark as Not Infected")),
+                    SizedBox(height: 5.0),
+                    ContactStream(contactEmail),
                     SizedBox(height: 5.0),
                   ],
                 ),

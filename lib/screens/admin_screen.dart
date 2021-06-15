@@ -119,7 +119,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   child: const CircleAvatar(),
                 ),
               ),
-              title: Text('I am Infected',style: TextStyle(fontSize: 25.0),),
+              title: Text('Infected',style: TextStyle(fontSize: 25.0),),
               onTap: () {
                 // Update the state of the app
                 setState(() {
@@ -183,7 +183,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   child: const CircleAvatar(),
                 ),
               ),
-              title: Text('I am Not Infected',style: TextStyle(fontSize: 25.0),),
+              title: Text('Not Infected',style: TextStyle(fontSize: 25.0),),
               onTap: () {
                 // Update the state of the app
                 setState(() {

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contacttracingprototype/components/notification_stream.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -131,6 +132,19 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         ),
         backgroundColor: Colors.orange,
         actions: [
+          TextButton(
+              onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (builder) {
+                    return NotificationStream(loggedInUser.email);
+                  }
+              ),
+              child: const Icon(
+                Icons.notification_important,
+                size: 30.0,
+                color: Colors.deepPurple,
+              ),
+          ),
           TextButton(
             onPressed: () {
               _auth.signOut();
@@ -377,3 +391,4 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     );
   }
 }
+

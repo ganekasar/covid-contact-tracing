@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contacttracingprototype/components/rounded_button.dart';
-import 'package:contacttracingprototype/constants.dart';
-import 'package:contacttracingprototype/screens/login.dart';
+import '../components/rounded_button.dart';
+import '../constants.dart';
 import 'nearby_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

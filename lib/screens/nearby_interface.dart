@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:nearby_connections/nearby_connections.dart';
-import '../components/contact_card.dart';
 import '../constants.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'welcome_screen.dart';
@@ -353,6 +352,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 30.0),
+            // ignore: deprecated_member_use
             child: RaisedButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0)),

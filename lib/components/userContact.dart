@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'bottom_sheet_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:location/location.dart';
-import 'package:nearby_connections/nearby_connections.dart';
-import '../components/contact_card.dart';
-import '../constants.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import '../components/listOfContacts.dart';
 
 Firestore _firestore = Firestore.instance;
-final _auth = FirebaseAuth.instance;
 
 class UserCard extends StatelessWidget {
   UserCard(

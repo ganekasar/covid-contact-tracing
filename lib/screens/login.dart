@@ -18,6 +18,33 @@ class _LoginScreenState extends State<LoginScreen> {
   String email;
   String password;
 
+  Future<void> _showMyDialog(var errorMessage) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Failed'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text(errorMessage.message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Okay'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
                     } catch (e) {
                       print(e);
+                      var res = await _showMyDialog(e);
                       Navigator.pushNamed(context, LoginScreen.id);
                     }
                   },

@@ -107,7 +107,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -138,8 +137,8 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
                     return NotificationStream(loggedInUser.email);
                   }
               ),
-              child: const Icon(
-                Icons.notification_important,
+              child: Icon(
+                NotificationStream.isNoNotification() ? Icons.notifications : Icons.notification_important_outlined,
                 size: 30.0,
                 color: Colors.deepPurple,
               ),

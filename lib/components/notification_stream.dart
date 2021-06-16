@@ -7,6 +7,7 @@ Firestore _firestore = Firestore.instance;
 
 class NotificationStream extends StatelessWidget {
   var loggedInUserEmail;
+  static int notificationCount = 0;
 
   NotificationStream(loggedUserEmail) {
     this.loggedInUserEmail = loggedUserEmail;
@@ -34,8 +35,13 @@ class NotificationStream extends StatelessWidget {
     return await getInfectedStatus(id);
   }
 
+  static bool isNoNotification() {
+    return (notificationCount == 0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    notificationCount = 0;
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('users')
@@ -85,7 +91,10 @@ class NotificationStream extends StatelessWidget {
             contactLocation: locationContact,
           );
 
+          int counter = 0;
+
           if(messageBubble.infection == 'Infected') {
+            notificationCount++;
             String usernameOfContact = messageBubble.contactUsername;
             messageBubbles.add(Text(
                 'User $usernameOfContact is Infected!',

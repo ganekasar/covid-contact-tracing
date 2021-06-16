@@ -55,7 +55,7 @@ class UserCard extends StatelessWidget {
                     },
                         child: Text("Mark as Infected")),
                     SizedBox(height: 5.0),
-                    ElevatedButton(onPressed: (){
+                    ElevatedButton(onPressed: () {
                       _firestore
                           .collection('users')
                           .document(contactEmail)

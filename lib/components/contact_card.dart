@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'bottom_sheet_text.dart';
+import 'package:geocoder/geocoder.dart';
 
 class ContactCard extends StatelessWidget {
   ContactCard(
